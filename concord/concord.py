@@ -247,10 +247,10 @@ class Morphit:
         '''
         args = self._argument_check(args)
         
-        if child in self.exceptions_list:
-            return self._exception(child)
-        
         child = self._pick_one(child, args)
+        
+        if child['lemma'] in self.exceptions_list:
+            return self._exception(child['lemma'])
         
         
         if self.pos in ['PRO-PERS','NOUN']:
@@ -298,5 +298,5 @@ class Morphit:
 
 
 if __name__ == "__main__":
-    w0 = Morphit('noi', 'PRO-PERS', 'f')
-    print(w0.agr('mangerei'))
+    w0 = Morphit('cosce', 'NOUN')
+    print(w0.agr('bella'))

@@ -26,7 +26,7 @@ w.features
 #{'gender': 'm', 'number': 'p', 'pos': 'NOUN', 'lemma': 'spaghetto'}
 ```
 
-The following methods get the corrisponding form, if existing in Morphit.
+The following methods get the corrisponding form, if existing in the Morphit. Concord doesn't actually use the original Morphit, but a .json reduced version containings just the inflected parts of speech. 
 
 
 ```python
