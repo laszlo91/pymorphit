@@ -1,6 +1,6 @@
 # Concord #
 
-A sample toolkit for Italian NLP, powered by Morphit.
+A simple NLP toolkit for Italian, powered by Morphit.
 
 
 ```python
@@ -47,7 +47,7 @@ w0.get_plural()
 #'vedevate'
 ```
 
-A method .article() ('definite' by default) returns the right article form, while a method .preposition(p) allows to build compound prepositions (preposition + definite article). Composable prepositions are 'di', 'a', 'da', 'in', 'su'.
+There's a method to get the right article form (both definite and indefinite) or to build compound prepositions (preposition + definite article). Composable prepositions are 'di', 'a', 'da', 'in', 'su'.
 
 
 ```python
@@ -62,7 +62,7 @@ w0.article('indefinite')
 #'uno'
 ```
 
-.agr(word): agr stands for agreement. It returns the correct inflection of the argument, based on the Morphit object, which works as the head. You can use it to get the agreement between a noun (or a personal pronoun) and an adjective (or other types of attributes and determiners) or a verb.
+AGR stands for agreement. This method returns the correct inflection of the argument, being dependent of Morphit object, which then works as the head. You can use it to get the agreement between a noun (or a personal pronoun) and an adjective (or other types of attributes and determiners) or a verb.
 
 
 ```python
@@ -83,7 +83,14 @@ w0.agr('mangerei')
 #'mangeremmo'
 ```
 
-Both to Morphit() or self.agr() you might have to add optional arguments to avoid ambiguities between forms. 
+You might have to add optional arguments when you initialize the Morphit object, in order to avoid ambiguities between forms.
+
+Here the allowed arguments:
+Parts of speech: ['VER', 'AUX', 'CAU', 'ASP', 'ADJ', 'DET-POSS', 'DET-WH', 'TALE', 'DET-INDEF', 'NOUN', 'PRO-PERS', 'CLI']
+Verbal modes: ['cond', 'ger', 'impr', 'ind', 'inf', 'part', 'sub']
+Person of the verbs: [1, 2, 3]
+Gender: ['m', 'f']
+Number: ['s', 'p']
 
 ## Credits ##
 
