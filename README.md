@@ -1,4 +1,4 @@
-# Concord #
+# pymorphit #
 
 A simple NLP toolkit for Italian, powered by Morphit.
 
