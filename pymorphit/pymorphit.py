@@ -26,8 +26,8 @@ class Morphit:
     
     
     
-    path_dir = os.path.dirname(os.path.abspath(__file__))
-    path2morphit = os.path.join(path_dir, "morphit/morphit_dictionary.json")
+    resources_dir = os.path.join(os.path.dirname(__file__), "morphit")
+    path2morphit = os.path.join(resources_dir, "morphit_dictionary.json")
     with open(path2morphit) as f:
         morphit = json.load(f)
     
@@ -294,9 +294,3 @@ class Morphit:
         
         elif child in self.exceptions[3]:
             return self.this()
-
-
-
-if __name__ == "__main__":
-    w0 = Morphit('cosce', 'NOUN')
-    print(w0.agr('bella'))

@@ -4,7 +4,7 @@ A simple NLP toolkit for Italian, powered by Morphit.
 
 
 ```python
-from concord import Morphit
+from pymorphit import Morphit
 
 w = Morphit('spaghetti')
 
