@@ -1,4 +1,4 @@
-import os, json, copy, re
+import os, json, copy, re, pickle
 
 class Morphit:
     
@@ -25,12 +25,10 @@ class Morphit:
     persons = [1, 2, 3]
     
     
-    
-    resources_dir = os.path.join(os.path.dirname(__file__), "morphit")
-    path2morphit = os.path.join(resources_dir, "morphit_dictionary.json")
-    with open(path2morphit) as f:
-        morphit = json.load(f)
-    
+    path_dir = os.path.dirname(os.path.abspath(__file__))
+    path2morphit = os.path.join(path_dir, "morphit/morphit.pkl")
+    with open(path2morphit, 'rb') as f:
+        morphit = pickle.load(f) 
     
     
     def __init__(self, word, *args):
