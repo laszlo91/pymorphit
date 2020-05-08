@@ -4,7 +4,8 @@ A simple NLP library for Italian, powered by Morphit.
 
 Under construction. You can test it with pip:
 
-```python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps pymorphit-laszlo94
+```python
+python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps pymorphit-laszlo94
 ```
 
 Some usage example:
