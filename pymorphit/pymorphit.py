@@ -1,7 +1,7 @@
 import os, json, copy, re, pickle
 
+
 class Morphit:
-    
     
     consonants = ('b', 'c', 'd', 'f', 'g', 'l','m', 'n', 'p', 'q', 'r', 's', 't', 'v', 'z')
     vowels = ('a','e','o','u','h') + tuple(('i' + i for i in list(consonants)))
@@ -9,10 +9,12 @@ class Morphit:
     exceptions = {
                   1: ['bello', 'quello'], 
                   2:['nessuno', 'nessun', 'nessuna', 'ciascuno', 'ciascuna', 'ciascun', 'ognun', 'ognuno', 'ognuna'],
-                  3:['questo']
-                  }
+                  3:['questo'],
+                 }
     exceptions_list = [i for j in [v for k,v in exceptions.items()] for i in j]
-    
+                
+    definites = ['il', 'la', 'lo', 'i', 'gli', 'le', "l'"]
+    indefinites = ["un'", "uno", "una", "un"]
     
     
     verbs = ['VER', 'AUX', 'CAU', 'ASP']
@@ -24,27 +26,33 @@ class Morphit:
     numbers = ['s', 'p']
     persons = [1, 2, 3]
     
-    
     path_dir = os.path.dirname(os.path.abspath(__file__))
     path2morphit = os.path.join(path_dir, "morphit/morphit.pkl")
-    with open(path2morphit, 'rb') as f:
-        morphit = pickle.load(f) 
     
     
     def __init__(self, word, *args):
         
-        self.word = word
-        
-        args = self._argument_check(args)
-        a = self._pick_forms(word, args)
-        
-        if len(a) == 1:
-            self.features = a[0]
+        if isinstance(word,dict):
+            self.word, self.features = [(k,v) for k,v in word.items()][0]
             self._collect_attributes()
+        
         else:
-            raise ValueError(f'''The word corresponds to several forms:
-            {a}
-            . Please disambiguate using pos, modes, gender, number or person as arguments.''')
+            self.word = word
+        
+            args = self._argument_check(args)
+            a = self._pick_forms(word, args)
+        
+            if len(a) == 1:
+                self.features = a[0]
+                self._collect_attributes()
+                
+            elif len(a) == 0:
+                raise ValueError(f'''No corresponding word in Morphit. Use the tool add2morphit.py''')
+            
+            else:
+                raise ValueError(f'''The word corresponds to several forms:
+                {a}
+                . Please disambiguate using pos, modes, gender, number or person as arguments.''')
             
             
     def _argument_check(self, args):
@@ -65,6 +73,9 @@ class Morphit:
         
 
     def _pick_forms(self, word, args):
+        
+        with open(self.path2morphit, 'rb') as f:
+            self.morphit = pickle.load(f) 
 
         all_compatible_forms=[]
        
@@ -245,11 +256,22 @@ class Morphit:
         '''
         args = self._argument_check(args)
         
+        if child in self.definites:
+            return self.article()
+        if child in self.indefinites:
+            return self.article('indefinite')
+            
         child = self._pick_one(child, args)
         
         if child['lemma'] in self.exceptions_list:
             return self._exception(child['lemma'])
         
+        if self.pos == child['pos']:
+            child_lemma = child['lemma']
+            child = self.features
+            child['lemma'] = child_lemma
+            return self._morphologize(child)
+            
         
         if self.pos in ['PRO-PERS','NOUN']:
                 
@@ -272,15 +294,15 @@ class Morphit:
 
     def _pick_one(self, child, args):
         try:
-            all_compatible_forms = [i for i in self._pick_forms(child, args) if i['pos'] not in ['NOUN', 'PRO-PERS']]
+            all_compatible_forms = [i for i in self._pick_forms(child, args) if i['pos'] not in ['PRO-PERS']] #'NOUN', 
             return all_compatible_forms[0]
         except IndexError:
-            raise ValueError("the word you're trying to concord is not present in the Morphit dictionary, or is a NOUN, or a non clitic PRO-PERS")
+            raise ValueError("the word you're trying to concord is not present in the Morphit dictionary, or a non clitic PRO-PERS") # or is a NOUN,
         
         
     def _morphologize(self, child):
-        return [j.split('_')[0] for j in self.morphit if self.morphit[j] == child][-1]
-
+        #return [j.split('_')[0] for j in self.morphit if self.morphit[j] == child][-1]
+        return Morphit([{j.split('_')[0]:l} for j,l in self.morphit.items() if self.morphit[j] == child][-1])#.word
          
     def _exception(self, child):
         
@@ -292,3 +314,15 @@ class Morphit:
         
         elif child in self.exceptions[3]:
             return self.this()
+            
+    
+if __name__ == "__main__":
+    pet = Morphit("orchi")
+    my = pet.agr('mio')
+    print(my.article(), my.word, pet.word)
+    
+    turn1 = Morphit("macchine")
+    turn2 = turn1.agr("automobile")
+    print(turn2.word)
+
+
