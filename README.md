@@ -5,7 +5,8 @@ A simple NLP toolkit for Italian, powered by Morphit.
 Under construction. You can test it with pip:
 
 ```
-python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps pymorphit-laszlo94
+pip install git+https://github.com/laszlo91/pymorphit.git
+
 ```
 
 Some usage example:
