@@ -4,8 +4,9 @@ import os, json, copy, re, pickle
 class Morphit:
     
     consonants = ('b', 'c', 'd', 'f', 'g', 'l','m', 'n', 'p', 'q', 'r', 's', 't', 'v', 'z')
-    vowels = ('a','e','o','u','h') + tuple(('i' + i for i in list(consonants)))
-    spurious = ('gn', 'ps', 'z', 'x', 'y', 'i') + tuple(('s' + i for i in list(consonants)))
+    vowels_partial = ('a','e','o','u','h')
+    vowels = vowels_partial + tuple(('i' + i for i in list(consonants)))
+    spurious = ('gn', 'ps', 'z', 'x', 'y') + tuple(('s' + i for i in list(consonants))) + tuple(('i' + j for j in list(vowels_partial)))
     exceptions = {
                   1: ['bello', 'quello'], 
                   2:['nessuno', 'nessun', 'nessuna', 'ciascuno', 'ciascuna', 'ciascun', 'ognun', 'ognuno', 'ognuna'],
@@ -31,6 +32,9 @@ class Morphit:
     
     
     def __init__(self, word, *args):
+        
+        with open(self.path2morphit, 'rb') as f:
+            self.morphit = pickle.load(f) 
         
         if isinstance(word,dict):
             self.word, self.features = [(k,v) for k,v in word.items()][0]
@@ -74,8 +78,8 @@ class Morphit:
 
     def _pick_forms(self, word, args):
         
-        with open(self.path2morphit, 'rb') as f:
-            self.morphit = pickle.load(f) 
+      #  with open(self.path2morphit, 'rb') as f:
+      #      self.morphit = pickle.load(f) 
 
         all_compatible_forms=[]
        
@@ -111,15 +115,18 @@ class Morphit:
             
             
     def article(self, form='definite'):
-         
-        if form is 'indefinite':
+            
+        if form is 'i':
+            
+            if self.number == 'p':
+                raise ValueError("No indefinite article with plural words. Try with self.preposition('di') if you want to simulate a partitive article behaviour")
+            
             if self.gender == 'f':
-                if self.number == "s":
-                    if self.is_vocalic():
-                        return "un'"
-                    if not self.is_vocalic():
-                        return "una"
-        
+                if self.is_vocalic():
+                    return "un'"
+                if not self.is_vocalic():
+                    return "una"
+                    
             elif self.gender == 'm':
                 if not self.is_spurious():
                     return "un"    
@@ -131,37 +138,32 @@ class Morphit:
             if self.gender == 'f':
             
                 if self.number == 's':
-                    return self._elision()
+                    if self.is_vocalic():
+                        return "l'"
+                    else:
+                        return "la"
+                            
                 elif self.number == 'p':
                     return "le"
         
             elif self.gender == 'm':
                 
                 if self.number == "s":
-                    if not self.is_spurious():
-                        return "il"    
-                    elif self.is_spurious():
-                        return self._elision()
+                    if self.is_spurious():
+                        return "lo"
+                    elif self.is_vocalic():
+                        return "l'"
+                    else:
+                        return "il"
             
                 elif self.number == "p":
-                    if not self.is_spurious():
-                        return "i"
-                    elif self.is_spurious():
+                    if self.is_spurious() or self.is_vocalic():
                         return "gli"
+                    else:
+                        return "i"
         else:
-            raise ValueError("use form='indefinite' if you want to get indefinite article. The article is 'definite' by default")
+            raise ValueError("use form='i' if you want to get indefinite article. The article is 'definite' by default")
             
-            
-    def _elision(self):
-        if self.is_vocalic():
-            return "l'"
-        elif not self.is_vocalic():
-            if self.gender == 'f':
-                return "la"
-            elif self.gender == 'f':
-                return "lo"
-    
-    
     
     def this(self):
     
@@ -204,7 +206,7 @@ class Morphit:
         
     def _indefinite_compound(self, root):
         root = re.sub('uno$|una$|un$', '', root)
-        art = self.article(form='indefinite')
+        art = self.article(form='i')
         return root + art
         
                 
@@ -244,24 +246,45 @@ class Morphit:
             
             
     def is_spurious(self):
-        if self.word.startswith(self.spurious + self.vowels):
+        if self.word.startswith(self.spurious):
             return True
         else:
             return False
-     
-     
+
+        
+            
     def agr(self, child, *args):
         '''
         concord NOUN with ADJ (et similia), VER // PRO-PERS with VER and ADJ (et similia)
         '''
+        
+        if child=='':
+            return ""
+            
+        if child.endswith("*"):
+            return child.strip("*")
+            
+        if ' ' in child:
+            tokens = child.split(' ')
+            
+            for ix, t in enumerate(tokens):
+                if '*' in t:
+                    unvar = t.strip('*')
+                    unvar_ix = ix
+                else:
+                    child = t
+                    child_ix = ix
+            
+      
         args = self._argument_check(args)
         
         if child in self.definites:
             return self.article()
         if child in self.indefinites:
-            return self.article('indefinite')
+            return self.article(form='i')
             
         child = self._pick_one(child, args)
+        
         
         if child['lemma'] in self.exceptions_list:
             return self._exception(child['lemma'])
@@ -281,13 +304,21 @@ class Morphit:
             if child['pos'] not in self.verbs or child['mode'] == 'part':  # or child['pos'] != 'CLI':
                 child['gender'] = self.gender
                 return self._morphologize(child)
-         
+
             child['person'] = '3'
             if self.pos == 'PRO-PERS':
                 child['person'] = self.person
             
             if child['mode'] in ["impr", 'inf']:
                 child['mode'] = 'ind'
+            
+            
+            if 'unvar' in locals():
+                if child_ix < unvar_ix:
+                    return self._morphologize(child) + " " + unvar
+                else:
+                    return unvar + " " + self._morphologize(child)
+                
             
             return self._morphologize(child)
 
@@ -297,12 +328,12 @@ class Morphit:
             all_compatible_forms = [i for i in self._pick_forms(child, args) if i['pos'] not in ['PRO-PERS']] #'NOUN', 
             return all_compatible_forms[0]
         except IndexError:
-            raise ValueError("the word you're trying to concord is not present in the Morphit dictionary, or a non clitic PRO-PERS") # or is a NOUN,
+            raise ValueError("the word you're trying to concord is not present in the Morphit dictionary, or is a non clitic PRO-PERS") # or is a NOUN,
         
         
     def _morphologize(self, child):
-        #return [j.split('_')[0] for j in self.morphit if self.morphit[j] == child][-1]
-        return Morphit([{j.split('_')[0]:l} for j,l in self.morphit.items() if self.morphit[j] == child][-1])#.word
+        return [j.split('_')[0] for j in self.morphit if self.morphit[j] == child][-1]
+        #return Morphit([{j.split('_')[0]:l} for j,l in self.morphit.items() if self.morphit[j] == child][-1])#.word
          
     def _exception(self, child):
         
@@ -314,15 +345,3 @@ class Morphit:
         
         elif child in self.exceptions[3]:
             return self.this()
-            
-    
-if __name__ == "__main__":
-    pet = Morphit("orchi")
-    my = pet.agr('mio')
-    print(my.article(), my.word, pet.word)
-    
-    turn1 = Morphit("macchine")
-    turn2 = turn1.agr("automobile")
-    print(turn2.word)
-
-
