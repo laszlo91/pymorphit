@@ -1,6 +1,6 @@
 # pymorphit #
 
-A simple NLP toolkit for Italian, powered by Morphit.
+This library uses Morphit (a free morphological resource for Italian) to describe the morphology of a word, and to retrieve its correct inflected form whenever it has a dependency relation with another one.
 
 Under construction. You can test it with pip:
 
@@ -75,6 +75,9 @@ AGR stands for agreement. This method returns the correct inflection of the argu
 
 
 ```python
+w.word
+#'spaghetti'
+
 w.agr('volava')
 #'volavano'
 
@@ -95,11 +98,20 @@ w0.agr('mangerei')
 You might have to add optional arguments when you initialize the Morphit object, in order to avoid ambiguities between forms.
 
 Here the allowed arguments:
+
 Parts of speech: ['VER', 'AUX', 'CAU', 'ASP', 'ADJ', 'DET-POSS', 'DET-WH', 'TALE', 'DET-INDEF', 'NOUN', 'PRO-PERS', 'CLI']
+
 Verbal modes: ['cond', 'ger', 'impr', 'ind', 'inf', 'part', 'sub']
+
 Person of the verbs: [1, 2, 3]
+
 Gender: ['m', 'f']
+
 Number: ['s', 'p']
+
+## Bonus ##
+
+http://phillipo.pythonanywhere.com/ <--- A flask web-app to compose anagrams (powered by Morphit
 
 ## Credits ##
 
