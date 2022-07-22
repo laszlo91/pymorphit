@@ -1,6 +1,7 @@
 # pymorphit #
 
-This library uses Morphit (a free morphological resource for Italian) to describe the morphology of a word, and to retrieve its correct inflected form whenever it has a dependency relation with another one.
+This library uses Morphit (a free morphological resource for Italian) to describe the morphology of a word, and to retrieve its correct inflected form whenever it has a dependency relation with another one. 
+It can be used for simple placeholder sentence generation (see the jupyter example for more details)
 
 Under construction. You can test it with pip:
 
@@ -111,7 +112,7 @@ Number: ['s', 'p']
 
 ## Bonus ##
 
-http://phillipo.pythonanywhere.com/ <--- A flask web-app to compose anagrams (powered by Morphit
+http://phillipo.pythonanywhere.com/ <--- A flask web-app to compose anagrams (again, powered by Morphit)
 
 ## Credits ##
 
