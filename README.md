@@ -36,7 +36,7 @@ w.features
 #{'gender': 'm', 'number': 'p', 'pos': 'NOUN', 'lemma': 'spaghetto'}
 ```
 
-The following methods get the corrisponding form, if existing in the Morphit. Concord doesn't actually use the original Morphit, but a .json reduced version containings just the inflected parts of speech. 
+The following methods get the corrisponding form, if existing in the Morphit. pymorphit doesn't actually use the original Morphit file, but a pickle compact version containings just the inflected parts of speech. If you want to add some new word to the Morphit pickle, please have a look to the command-line script add2morphit.py
 
 
 ```python
@@ -100,15 +100,15 @@ You might have to add optional arguments when you initialize the Morphit object,
 
 Here the allowed arguments:
 
-Parts of speech: ['VER', 'AUX', 'CAU', 'ASP', 'ADJ', 'DET-POSS', 'DET-WH', 'TALE', 'DET-INDEF', 'NOUN', 'PRO-PERS', 'CLI']
+Parts of speech: **['VER', 'AUX', 'CAU', 'ASP', 'ADJ', 'DET-POSS', 'DET-WH', 'TALE', 'DET-INDEF', 'NOUN', 'PRO-PERS', 'CLI']**
 
-Verbal modes: ['cond', 'ger', 'impr', 'ind', 'inf', 'part', 'sub']
+Verbal modes: **['cond', 'ger', 'impr', 'ind', 'inf', 'part', 'sub']**
 
-Person of the verbs: [1, 2, 3]
+Person of the verbs: **[1, 2, 3]**
 
-Gender: ['m', 'f']
+Gender: **['m', 'f']**
 
-Number: ['s', 'p']
+Number: **['s', 'p']**
 
 ## Bonus ##
 
